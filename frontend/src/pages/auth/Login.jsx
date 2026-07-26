@@ -1,7 +1,22 @@
+import { useState } from "react";
 import "./Auth.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Login(){
+
+    const [role,setRole]=useState("Freelancer");
+    const navigate=useNavigate();
+
+    const handleLogin=(e)=>{
+        e.preventDefault();
+
+        if(role=="Client"){
+            navigate();
+        }
+        else{
+            navigate();
+        }
+    };
     return(
         <div className="auth-container">
 
@@ -18,7 +33,21 @@ function Login(){
                     <h2>Login</h2>
                     <p>Login into your FlowFund account to continue</p>
 
-                    <form>
+                    <div className="role-toggle">
+                        <button
+                            type="button"
+                            className={role==="Freelancer"?"active-role":""}
+                            onClick={()=>setRole("Freelancer")}
+                        >Freelancer</button>
+
+                        <button
+                            type="button"
+                            className={role==="Client"?"active-role":""}
+                            onClick={()=>setRole("Client")}
+                        >Client</button>
+                    </div>
+
+                    <form onSubmit={handleLogin}>
                         <div className="input-group">
                             <label>Email</label>
                             <input type="email" placeholder="Enter your email" />

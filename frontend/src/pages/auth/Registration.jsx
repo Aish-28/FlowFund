@@ -1,7 +1,10 @@
+import { useState } from "react";
 import "./Auth.css";
 import { Link } from "react-router-dom";
 
 function Registration(){
+
+    const [role,setRole]=useState("Freelancer");
     return(
         <div className="auth-container">
 
@@ -29,6 +32,16 @@ function Registration(){
                         <div className="input-group">
                             <label>Email</label>
                             <input type="email" placeholder="Enter your email" />
+                        </div>
+
+                        <div className="input-group">
+                            <label>Role</label>
+                            <select value={role}
+                                    onChange={(e)=>setRole(e.target.value)}>
+
+                                <option value="Freelancer">Freelancer</option>
+                                <option value="Client">Client</option>
+                            </select>
                         </div>
 
                         <div className="input-group">
