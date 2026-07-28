@@ -98,6 +98,38 @@
     border-color:#1565c0;
 }
 
+.password-field{
+    position:relative;
+    width:100%;
+}
+
+.password-field input{
+    width:100%;
+    padding:14px 45px 14px 14px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    outline:none;
+    font-size:15px;
+}
+
+.password-field input:focus{
+    border-color:#1565c0;
+}
+
+.password-toggle{
+    position:absolute;
+    right:15px;
+    top:70%;
+    transform:translateY(-50%);
+    cursor:pointer;
+    color:#666;
+    font-size:18px;
+}
+
+.password-toggle:hover{
+    color:#1565c0;
+}
+
 .auth-btn{
     width:100%;
     padding:15px;
