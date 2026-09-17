@@ -13,6 +13,7 @@ import com.flowfund.backend.entity.Wallet;
 import com.flowfund.backend.enums.UserStatus;
 import com.flowfund.backend.repository.UserRepository;
 import com.flowfund.backend.repository.WalletRepository;
+import com.flowfund.backend.security.JWTService;
 import com.flowfund.backend.service.UserService;
 
 @Service
@@ -21,12 +22,14 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final WalletRepository walletRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JWTService jwtService;
 
     public UserServiceImpl(UserRepository userRepository, WalletRepository walletRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder, JWTService jwtService) {
         this.userRepository = userRepository;
         this.walletRepository = walletRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService=jwtService;
     }
 
     @Override
@@ -73,8 +76,23 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AuthResponse loginUser(UserLoginRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'loginUser'");
+        User user=userRepository.findByEmail(request.getEmail())
+        .orElseThrow(()->new RuntimeException("User not Found"));
+
+        if(!passwordEncoder.matches(request.getPassword(), user.getPassword())){
+            throw new RuntimeException("Invalid Username or Password");
+        }
+        String token=jwtService.generateToken(user.getEmail());
+
+        AuthResponse loginResponse=new AuthResponse();
+        loginResponse.setMessage("Login Successful");
+        loginResponse.setUserId(user.getId());
+        loginResponse.setName(user.getName());
+        loginResponse.setRole(user.getRole().name());
+        loginResponse.setToken(token);
+
+        return loginResponse;
+        
     }
     
 }
