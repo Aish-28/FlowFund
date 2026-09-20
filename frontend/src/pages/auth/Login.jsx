@@ -2,6 +2,7 @@ import { useState } from "react";
 import "./Auth.css";
 import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { loginUser } from "../../services/authService";
 
 function Login(){
 
@@ -13,16 +14,30 @@ function Login(){
 
     const navigate=useNavigate();
 
-    const handleLogin=(e)=>{
+    const handleLogin = async (e) => {
         e.preventDefault();
 
-        if(role=="Client"){
-            navigate();
-        }
-        else{
-            navigate();
+        try {
+            const data = await loginUser(email, password);
+
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("userId", data.userId);
+            localStorage.setItem("name", data.name);
+            localStorage.setItem("role", data.role);
+
+            console.log("Login successful:", data);
+
+            if (data.role === "FREELANCER") {
+                navigate("/freelancer-dashboard");
+            } else if (data.role === "CLIENT") {
+                navigate("/client-dashboard");
+            }
+
+        } catch (error) {
+            console.error("Login failed:", error);
         }
     };
+
     return(
         <div className="auth-container">
 
