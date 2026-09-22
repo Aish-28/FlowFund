@@ -6,9 +6,8 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.flowfund.backend.entity.PayoutPreferences;
-import com.flowfund.backend.entity.User;
 
-public interface PayoutPrferencesRepository extends JpaRepository<PayoutPreferences, UUID>{
+public interface PayoutPreferencesRepository extends JpaRepository<PayoutPreferences, UUID>{
     
-    Optional<PayoutPreferences> findByUser(User user);
+    Optional<PayoutPreferences> findByUser_Id(UUID userId);
 }
