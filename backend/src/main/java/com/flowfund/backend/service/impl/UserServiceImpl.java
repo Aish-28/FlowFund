@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
 
             Wallet wallet=new Wallet();
             wallet.setUser(savedUser);
-            wallet.setBalance(BigDecimal.ZERO);
+            wallet.setBalance(new BigDecimal("20000"));
             wallet.setReserveBalance(BigDecimal.ZERO);
             wallet.setStatus(UserStatus.ACTIVE);
 
