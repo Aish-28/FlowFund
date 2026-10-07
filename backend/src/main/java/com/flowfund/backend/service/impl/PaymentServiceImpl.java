@@ -18,6 +18,7 @@ import com.flowfund.backend.repository.PaymentRepository;
 import com.flowfund.backend.repository.TransactionRepository;
 import com.flowfund.backend.repository.UserRepository;
 import com.flowfund.backend.repository.WalletRepository;
+import com.flowfund.backend.service.EmailService;
 import com.flowfund.backend.service.PaymentService;
 
 import jakarta.transaction.Transactional;
@@ -29,13 +30,15 @@ public class PaymentServiceImpl implements PaymentService{
     private final UserRepository userRepository;
 	private final WalletRepository walletRepository;
 	private final TransactionRepository transactionRepository;
+	private final EmailService emailService;
 
 	public PaymentServiceImpl(PaymentRepository paymentRepository, UserRepository userRepository,
-			WalletRepository walletRepository, TransactionRepository transactionRepository) {
+			WalletRepository walletRepository, TransactionRepository transactionRepository, EmailService emailService) {
 		this.paymentRepository = paymentRepository;
 		this.userRepository = userRepository;
 		this.walletRepository = walletRepository;
 		this.transactionRepository = transactionRepository;
+		this.emailService=emailService;
 	}
 
 	@Override
@@ -112,6 +115,24 @@ public class PaymentServiceImpl implements PaymentService{
 		freelancerTransaction.setRemarks("Payment received from client");
 
 		transactionRepository.save(freelancerTransaction);
+
+		// Send payment success email to client
+		emailService.sendPaymentSuccessEmail(
+				client.getEmail(),
+				client.getName(),
+				freelancer.getName(),
+				payment.getAmount(),
+				"CLIENT"
+		);
+
+		// Send payment success email to freelancer
+		emailService.sendPaymentSuccessEmail(
+				freelancer.getEmail(),
+				freelancer.getName(),
+				client.getName(),
+				payment.getAmount(),
+				"FREELANCER"
+		);
 
 		return savedPayment;
 	}
