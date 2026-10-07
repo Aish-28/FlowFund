@@ -62,23 +62,68 @@ public class PayoutServiceImpl implements PayoutService {
 
         BigDecimal payoutAmount = preferences.getTargetSalary();
 
-        if (payoutAmount == null || payoutAmount.compareTo(BigDecimal.ZERO) <= 0) {
+        if (payoutAmount == null
+                || payoutAmount.compareTo(BigDecimal.ZERO) <= 0) {
+
             throw new RuntimeException("Invalid payout amount");
         }
 
-        if (wallet.getBalance().compareTo(payoutAmount) < 0) {
-            throw new RuntimeException("Insufficient balance for monthly payout");
+        BigDecimal balance = wallet.getBalance();
+        BigDecimal reserveBalance = wallet.getReserveBalance();
+
+        if (balance == null) {
+            balance = BigDecimal.ZERO;
         }
+
+        if (reserveBalance == null) {
+            reserveBalance = BigDecimal.ZERO;
+        }
+
+        BigDecimal totalAvailable = balance.add(reserveBalance);
+
+        if (totalAvailable.compareTo(payoutAmount) < 0) {
+            throw new RuntimeException(
+                    "Insufficient funds for monthly payout"
+            );
+        }
+
+        BigDecimal remainingPayout = payoutAmount;
+
+        // First use the normal wallet balance
+        if (balance.compareTo(remainingPayout) >= 0) {
+
+            balance = balance.subtract(remainingPayout);
+            remainingPayout = BigDecimal.ZERO;
+
+        } else {
+
+            remainingPayout = remainingPayout.subtract(balance);
+            balance = BigDecimal.ZERO;
+        }
+
+        // If normal balance was not enough, use reserve
+        if (remainingPayout.compareTo(BigDecimal.ZERO) > 0) {
+
+            if (reserveBalance.compareTo(remainingPayout) >= 0) {
+
+                reserveBalance = reserveBalance.subtract(remainingPayout);
+                remainingPayout = BigDecimal.ZERO;
+
+            } else {
+
+                throw new RuntimeException(
+                        "Insufficient reserve balance for monthly payout"
+                );
+            }
+        }
+
+        wallet.setBalance(balance);
+        wallet.setReserveBalance(reserveBalance);
+
+        walletRepository.save(wallet);
 
         LocalDate date = LocalDate.now();
         LocalTime time = LocalTime.now();
-
-        // Deduct payout amount from freelancer wallet
-        wallet.setBalance(
-                wallet.getBalance().subtract(payoutAmount)
-        );
-
-        walletRepository.save(wallet);
 
         // Create payout record
         Payout payout = new Payout();
@@ -105,6 +150,8 @@ public class PayoutServiceImpl implements PayoutService {
 
     @Override
     public List<Payout> getPayoutsByUserId(UUID userId) {
-        return payoutRepository.findByUser_IdOrderByDateDescTimeDesc(userId);
+
+        return payoutRepository
+                .findByUser_IdOrderByDateDescTimeDesc(userId);
     }
 }

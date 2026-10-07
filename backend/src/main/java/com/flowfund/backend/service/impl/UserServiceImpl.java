@@ -1,6 +1,8 @@
 package com.flowfund.backend.service.impl;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.UUID;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,67 +26,79 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final JWTService jwtService;
 
-    public UserServiceImpl(UserRepository userRepository, WalletRepository walletRepository,
-            PasswordEncoder passwordEncoder, JWTService jwtService) {
+    public UserServiceImpl(
+            UserRepository userRepository,
+            WalletRepository walletRepository,
+            PasswordEncoder passwordEncoder,
+            JWTService jwtService) {
         this.userRepository = userRepository;
         this.walletRepository = walletRepository;
         this.passwordEncoder = passwordEncoder;
-        this.jwtService=jwtService;
+        this.jwtService = jwtService;
     }
 
     @Override
     public AuthResponse registerUser(UserRegistrationRequest request) {
 
-            if(!request.getPassword().equals(request.getConfirmPassword())){
-                throw new RuntimeException("Passwords do not match");
-            }
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
+            throw new RuntimeException("Passwords do not match");
+        }
 
-            if(userRepository.existsByEmail(request.getEmail())){
-                throw new RuntimeException("Email already exists");
-            }
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email already exists");
+        }
 
-            if(userRepository.existsByPhNo(request.getPhNo())){
-                throw new RuntimeException("Phno already exists");
-            }
+        if (userRepository.existsByPhNo(request.getPhNo())) {
+            throw new RuntimeException("Phno already exists");
+        }
 
-            User user=new User();
-            user.setName(request.getName());
-            user.setEmail(request.getEmail());
-            user.setPhNo(request.getPhNo());
-            user.setRole(request.getRole());
-            user.setStatus(UserStatus.ACTIVE);
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
+        User user = new User();
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+        user.setPhNo(request.getPhNo());
+        user.setRole(request.getRole());
+        user.setStatus(UserStatus.ACTIVE);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-            User savedUser=userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
-            Wallet wallet=new Wallet();
-            wallet.setUser(savedUser);
-            wallet.setBalance(new BigDecimal("20000"));
-            wallet.setReserveBalance(BigDecimal.ZERO);
-            wallet.setStatus(UserStatus.ACTIVE);
+        Wallet wallet = new Wallet();
+        wallet.setUser(savedUser);
+        wallet.setBalance(new BigDecimal("20000"));
+        wallet.setReserveBalance(BigDecimal.ZERO);
+        wallet.setStatus(UserStatus.ACTIVE);
 
-            walletRepository.save(wallet);
+        walletRepository.save(wallet);
 
-            AuthResponse response=new AuthResponse();
-            response.setMessage("Registration succesful");
-            response.setUserId(savedUser.getId());
-            response.setName(savedUser.getName());
-            response.setRole(savedUser.getRole().name());
+        AuthResponse response = new AuthResponse();
+        response.setMessage("Registration succesful");
+        response.setUserId(savedUser.getId());
+        response.setName(savedUser.getName());
+        response.setRole(savedUser.getRole().name());
 
-            return response;
+        return response;
     }
 
     @Override
     public AuthResponse loginUser(UserLoginRequest request) {
-        User user=userRepository.findByEmail(request.getEmail())
-        .orElseThrow(()->new RuntimeException("User not Found"));
 
-        if(!passwordEncoder.matches(request.getPassword(), user.getPassword())){
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not Found"));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid Username or Password");
         }
-        String token=jwtService.generateToken(user.getEmail());
 
-        AuthResponse loginResponse=new AuthResponse();
+        if (user.getStatus() == UserStatus.BLOCKED) {
+            throw new RuntimeException("Your account is blocked");
+        }
+
+        String token = jwtService.generateToken(
+                user.getEmail(),
+                user.getRole().name()
+        );
+
+        AuthResponse loginResponse = new AuthResponse();
         loginResponse.setMessage("Login Successful");
         loginResponse.setUserId(user.getId());
         loginResponse.setName(user.getName());
@@ -92,7 +106,26 @@ public class UserServiceImpl implements UserService {
         loginResponse.setToken(token);
 
         return loginResponse;
-        
     }
-    
+
+    @Override
+    public List<User> getAllUsers() {
+        return userRepository.findAllByOrderByCreatedAtDesc();
+    }
+
+    @Override
+    public User updateUserStatus(UUID userId, String status) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        try {
+            UserStatus newStatus = UserStatus.valueOf(status.toUpperCase());
+            user.setStatus(newStatus);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid user status. Use ACTIVE or BLOCKED");
+        }
+
+        return userRepository.save(user);
+    }
 }

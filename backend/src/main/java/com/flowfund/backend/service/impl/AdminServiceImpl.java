@@ -32,7 +32,7 @@ public class AdminServiceImpl  implements AdminService{
             throw new RuntimeException("Invalid username or password");
         }
 
-        String token=jwtService.generateToken(admin.getEmail());
+        String token=jwtService.generateToken(admin.getEmail(),"ADMIN");
 
         AuthResponse logiResponse=new AuthResponse();
         logiResponse.setMessage("Login successful");

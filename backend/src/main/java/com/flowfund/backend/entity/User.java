@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.hibernate.annotations.UuidGenerator;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flowfund.backend.enums.UserRoles;
 import com.flowfund.backend.enums.UserStatus;
 
@@ -42,6 +43,7 @@ public class User {
     private String email;
 
     @NotBlank
+    @JsonIgnore 
     @Column(name = "password", nullable = false)
     private String password;
 
