@@ -13,6 +13,10 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 
 import ProtectedRoute from "./utils/ProtectedRoute";
 import Transactions from "./pages/client/Transactions";
+import FreelancerWallet from "./pages/freelancer/Wallet";
+import FreelancerPayments from "./pages/freelancer/Payments";
+import FreelancerTransactions from "./pages/freelancer/Transactions";
+import FreelancerPayout from "./pages/freelancer/Payout";
 
 export default function App() {
     return (
@@ -42,6 +46,40 @@ export default function App() {
                 element={
                     <ProtectedRoute allowedRole="FREELANCER">
                         <FreelancerDashboard />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/freelancer-wallet"
+                element={
+                    <ProtectedRoute allowedRole="FREELANCER">
+                        <FreelancerWallet />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/freelancer-payments"
+                element={
+                    <ProtectedRoute allowedRole="FREELANCER">
+                        <FreelancerPayments />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/freelancer-transactions"
+                element={
+                    <ProtectedRoute allowedRole="FREELANCER">
+                        <FreelancerTransactions />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/freelancer-payout"
+                element={
+                    <ProtectedRoute allowedRole="FREELANCER">
+                        <FreelancerPayout />
                     </ProtectedRoute>
                 }
             />

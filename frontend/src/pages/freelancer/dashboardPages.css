@@ -1,0 +1,209 @@
+.section-gap {
+    margin-top: 18px;
+}
+
+.wallet-summary-box {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    border: 1px solid #edf0f5;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.wallet-summary-box > div {
+    padding: 18px;
+    border-right: 1px solid #edf0f5;
+}
+
+.wallet-summary-box > div:last-child {
+    border-right: 0;
+}
+
+.wallet-summary-box span,
+.wallet-summary-box strong {
+    display: block;
+}
+
+.wallet-summary-box span {
+    color: #7b8290;
+    font-size: 11px;
+}
+
+.wallet-summary-box strong {
+    margin-top: 7px;
+    font-size: 18px;
+}
+
+.dashboard-message {
+    margin-bottom: 18px;
+}
+
+.error-message,
+.success-message {
+    padding: 13px 14px;
+    border-radius: 10px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 12px;
+}
+
+.error-message {
+    background: #fff0f2;
+    color: #b53a4a;
+}
+
+.success-message {
+    background: #eaf8f3;
+    color: #0b7b5a;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.form-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #4b5563;
+}
+
+.form-control {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #dfe3ea;
+    border-radius: 9px;
+    padding: 11px 13px;
+    font-size: 13px;
+    outline: none;
+    background: #fff;
+}
+
+.form-control:focus {
+    border-color: #6a5ce6;
+    box-shadow: 0 0 0 3px rgba(106, 92, 230, 0.1);
+}
+
+.input-with-icon {
+    position: relative;
+}
+
+.input-with-icon .form-control {
+    padding-right: 38px;
+}
+
+.currency-prefix {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #8a91a0;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.btn {
+    border: 0;
+    border-radius: 9px;
+    padding: 11px 15px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: #6a5ce6;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: #584bd0;
+}
+
+.btn-secondary {
+    background: #f1f2f6;
+    color: #4b5563;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 620px;
+}
+
+.data-table th,
+.data-table td {
+    padding: 13px 10px;
+    border-bottom: 1px solid #edf0f5;
+    text-align: left;
+    font-size: 12px;
+}
+
+.data-table th {
+    color: #7b8290;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.status-badge {
+    display: inline-flex;
+    border-radius: 999px;
+    padding: 5px 8px;
+    font-size: 10px;
+    font-weight: 800;
+    background: #f0f2f6;
+    color: #6b7280;
+}
+
+.status-success {
+    background: #eaf8f3;
+    color: #0b7b5a;
+}
+
+.status-warning {
+    background: #fff6df;
+    color: #a86d0a;
+}
+
+.status-danger {
+    background: #fff0f2;
+    color: #b53a4a;
+}
+
+@media (max-width: 700px) {
+
+    .wallet-summary-box {
+        grid-template-columns: 1fr;
+    }
+
+    .wallet-summary-box > div {
+        border-right: 0;
+        border-bottom: 1px solid #edf0f5;
+    }
+
+    .wallet-summary-box > div:last-child {
+        border-bottom: 0;
+    }
+}
