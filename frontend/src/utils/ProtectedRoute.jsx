@@ -10,6 +10,19 @@ function ProtectedRoute({ children, allowedRole }) {
     }
 
     if (role !== allowedRole) {
+
+        if (role === "CLIENT") {
+            return <Navigate to="/client-dashboard" replace />;
+        }
+
+        if (role === "FREELANCER") {
+            return <Navigate to="/freelancer-dashboard" replace />;
+        }
+
+        if (role === "ADMIN") {
+            return <Navigate to="/admin-dashboard" replace />;
+        }
+
         return <Navigate to="/login" replace />;
     }
 

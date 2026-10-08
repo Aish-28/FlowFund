@@ -2,16 +2,18 @@ package com.flowfund.backend.service;
 
 import java.math.BigDecimal;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-@Service 
+@Service
 public class EmailService {
 
-    @Autowired 
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
+
+    public EmailService(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
 
     public void sendPaymentSuccessEmail(
             String to,
@@ -45,5 +47,4 @@ public class EmailService {
 
         mailSender.send(message);
     }
-    
 }

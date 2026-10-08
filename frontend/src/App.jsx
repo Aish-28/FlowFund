@@ -1,33 +1,63 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Login from "./pages/auth/Login";
-import Registration from "./pages/auth/Registration";
+import { Navigate, Route, Routes } from "react-router-dom";
+
 import Home from "./pages/landing/Home";
+import Login from "./pages/auth/Login";
 import AdminLogin from "./pages/auth/AdminLogin";
+
+import FreelancerDashboard from "./pages/freelancer/FreelancerDashboard";
+import ClientDashboard from "./pages/client/ClientDashboard";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+
 import ProtectedRoute from "./utils/ProtectedRoute";
+import Registration from "./pages/auth/Registration";
 
-function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home/>}></Route>
-        <Route path="/register" element={<Registration/>}></Route>
-        <Route path="/login" element={<Login/>}></Route>
-        <Route path="/admin/login" element={<AdminLogin/>}></Route>
-        <Route path="/freelancer-dashboard" element={<ProtectedRoute allowedRole="FREELANCER">
-            <FreelancerDashboard />
-        </ProtectedRoute>}/>
-        <Route path="/client-dashboard" element={<ProtectedRoute allowedRole="CLIENT">
-            <ClientDashboard />
-        </ProtectedRoute>}/>
-        <Route path="/admin-dashboard" element={<ProtectedRoute allowedRole="ADMIN">
-            <AdminDashboard />
-        </ProtectedRoute>}/>
+export default function App() {
+    return (
+        <Routes>
 
-      </Routes>
-    </BrowserRouter>
+            <Route path="/" element={<Home />} />
 
-    // <Registration/>
-  );
+            <Route path="/register" element={<Registration />} />
+
+            <Route path="/login" element={<Login />} />
+
+            <Route
+                path="/admin/login"
+                element={<AdminLogin />}
+            />
+
+            <Route
+                path="/freelancer-dashboard"
+                element={
+                    <ProtectedRoute allowedRole="FREELANCER">
+                        <FreelancerDashboard />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/client-dashboard"
+                element={
+                    <ProtectedRoute allowedRole="CLIENT">
+                        <ClientDashboard />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/admin-dashboard"
+                element={
+                    <ProtectedRoute allowedRole="ADMIN">
+                        <AdminDashboard />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="*"
+                element={<Navigate to="/" replace />}
+            />
+
+        </Routes>
+    );
 }
-
-export default App;
