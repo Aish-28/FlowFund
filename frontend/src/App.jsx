@@ -2,30 +2,41 @@ import { Navigate, Route, Routes } from "react-router-dom";
 
 import Home from "./pages/landing/Home";
 import Login from "./pages/auth/Login";
+import Registration from "./pages/auth/Registration";
 import AdminLogin from "./pages/auth/AdminLogin";
+import Payments from "./pages/client/Payments";
 
 import FreelancerDashboard from "./pages/freelancer/FreelancerDashboard";
 import ClientDashboard from "./pages/client/ClientDashboard";
+import Wallet from "./pages/client/Wallet";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 
 import ProtectedRoute from "./utils/ProtectedRoute";
-import Registration from "./pages/auth/Registration";
+import Transactions from "./pages/client/Transactions";
 
 export default function App() {
     return (
         <Routes>
-
+            {/* Landing */}
             <Route path="/" element={<Home />} />
 
-            <Route path="/register" element={<Registration />} />
+            {/* Authentication */}
+            <Route
+                path="/register"
+                element={<Registration />}
+            />
 
-            <Route path="/login" element={<Login />} />
+            <Route
+                path="/login"
+                element={<Login />}
+            />
 
             <Route
                 path="/admin/login"
                 element={<AdminLogin />}
             />
 
+            {/* Freelancer */}
             <Route
                 path="/freelancer-dashboard"
                 element={
@@ -35,6 +46,7 @@ export default function App() {
                 }
             />
 
+            {/* Client */}
             <Route
                 path="/client-dashboard"
                 element={
@@ -45,6 +57,34 @@ export default function App() {
             />
 
             <Route
+                path="/client-wallet"
+                element={
+                    <ProtectedRoute allowedRole="CLIENT">
+                        <Wallet />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/client-payments"
+                element={
+                    <ProtectedRoute allowedRole="CLIENT">
+                        <Payments />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+              path="/client-transactions"
+              element={
+                  <ProtectedRoute allowedRole="CLIENT">
+                      <Transactions />
+                  </ProtectedRoute>
+              }
+          />
+
+            {/* Admin */}
+            <Route
                 path="/admin-dashboard"
                 element={
                     <ProtectedRoute allowedRole="ADMIN">
@@ -53,11 +93,11 @@ export default function App() {
                 }
             />
 
+            {/* Unknown URL */}
             <Route
                 path="*"
                 element={<Navigate to="/" replace />}
             />
-
         </Routes>
     );
 }

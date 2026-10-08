@@ -190,14 +190,19 @@ function ClientDashboard() {
                 },
                 {
                     label: "Wallet",
-                    to: "/client-dashboard#wallet",
+                    to: "/client-wallet",
                     icon: "wallet"
                 },
                 {
                     label: "Payments",
-                    to: "/client-dashboard#payments",
+                    to: "/client-payments",
                     icon: "transactions"
-                }
+                },
+                {
+                    label: "Transactions",
+                    to: "/client-transactions",
+                    icon: "transactions"
+                }  
             ]}
         >
 
