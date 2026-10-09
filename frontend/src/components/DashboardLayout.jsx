@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import {
     FiActivity,
@@ -32,12 +33,8 @@ export default function DashboardLayout({
     role,
     navItems = []
 }) {
-
-    const [collapsed, setCollapsed] =
-        useState(false);
-
-    const [mobileOpen, setMobileOpen] =
-        useState(false);
+    const [collapsed, setCollapsed] = useState(false);
+    const [mobileOpen, setMobileOpen] = useState(false);
 
     const navigate = useNavigate();
 
@@ -63,7 +60,7 @@ export default function DashboardLayout({
         logout();
 
         navigate(
-            "/login",
+            role === "ADMIN" ? "/admin/login" : "/login",
             {
                 replace: true
             }
@@ -72,27 +69,16 @@ export default function DashboardLayout({
 
     return (
         <div
-            className={
-                `dashboard-shell ${
-                    collapsed
-                        ? "sidebar-collapsed"
-                        : ""
-                }`
-            }
+            className={`dashboard-shell ${
+                collapsed ? "sidebar-collapsed" : ""
+            }`}
         >
-
             <aside
-                className={
-                    `dashboard-sidebar ${
-                        mobileOpen
-                            ? "mobile-open"
-                            : ""
-                    }`
-                }
+                className={`dashboard-sidebar ${
+                    mobileOpen ? "mobile-open" : ""
+                }`}
             >
-
                 <div className="sidebar-brand">
-
                     <Link
                         to="/"
                         className="dashboard-brand"
@@ -102,21 +88,17 @@ export default function DashboardLayout({
                         </span>
 
                         {!collapsed && (
-                            <span>
-                                FlowFund
-                            </span>
+                            <span>FlowFund</span>
                         )}
                     </Link>
 
                     <button
                         className="mobile-close"
-                        onClick={() =>
-                            setMobileOpen(false)
-                        }
+                        onClick={() => setMobileOpen(false)}
+                        aria-label="Close menu"
                     >
                         <FiX />
                     </button>
-
                 </div>
 
                 <div className="sidebar-role">
@@ -132,43 +114,30 @@ export default function DashboardLayout({
                 </div>
 
                 <nav className="dashboard-nav">
-
                     {navItems.map((item) => {
-
                         const Icon =
-                            iconMap[item.icon] ||
-                            FiGrid;
+                            iconMap[item.icon] || FiGrid;
 
                         return (
                             <Link
                                 key={item.label}
-                                to={item.to}
+                                to={item.to || item.path}
                                 className={
-                                    item.active
-                                        ? "active"
-                                        : ""
+                                    item.active ? "active" : ""
                                 }
-                                onClick={() =>
-                                    setMobileOpen(
-                                        false
-                                    )
-                                }
+                                onClick={() => setMobileOpen(false)}
                             >
                                 <Icon />
 
                                 {!collapsed && (
-                                    <span>
-                                        {item.label}
-                                    </span>
+                                    <span>{item.label}</span>
                                 )}
                             </Link>
                         );
                     })}
-
                 </nav>
 
                 <div className="sidebar-bottom">
-
                     <button
                         className="dashboard-logout"
                         onClick={handleLogout}
@@ -176,29 +145,18 @@ export default function DashboardLayout({
                         <FiLogOut />
 
                         {!collapsed && (
-                            <span>
-                                Logout
-                            </span>
+                            <span>Logout</span>
                         )}
                     </button>
-
                 </div>
-
             </aside>
 
             <main className="dashboard-main">
-
                 <header className="dashboard-header">
-
                     <div className="header-left">
-
                         <button
                             className="sidebar-toggle"
-                            onClick={() =>
-                                setCollapsed(
-                                    !collapsed
-                                )
-                            }
+                            onClick={() => setCollapsed(!collapsed)}
                             aria-label="Toggle sidebar"
                         >
                             {
@@ -210,62 +168,34 @@ export default function DashboardLayout({
 
                         <button
                             className="mobile-menu"
-                            onClick={() =>
-                                setMobileOpen(
-                                    true
-                                )
-                            }
+                            onClick={() => setMobileOpen(true)}
                             aria-label="Open menu"
                         >
                             <FiMenu />
                         </button>
 
                         <div>
-
-                            <h1>
-                                {title}
-                            </h1>
-
-                            <p>
-                                {subtitle}
-                            </p>
-
+                            <h1>{title}</h1>
+                            <p>{subtitle}</p>
                         </div>
-
                     </div>
 
                     <div className="profile-chip">
-
                         <div className="profile-avatar">
-                            {
-                                displayName
-                                    .charAt(0)
-                                    .toUpperCase()
-                            }
+                            {displayName.charAt(0).toUpperCase()}
                         </div>
 
                         <div>
-
-                            <strong>
-                                {displayName}
-                            </strong>
-
-                            <span>
-                                {role}
-                            </span>
-
+                            <strong>{displayName}</strong>
+                            <span>{role}</span>
                         </div>
-
                     </div>
-
                 </header>
 
                 <section className="dashboard-content">
                     {children}
                 </section>
-
             </main>
-
         </div>
     );
 }

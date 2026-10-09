@@ -17,6 +17,9 @@ import FreelancerWallet from "./pages/freelancer/Wallet";
 import FreelancerPayments from "./pages/freelancer/Payments";
 import FreelancerTransactions from "./pages/freelancer/Transactions";
 import FreelancerPayout from "./pages/freelancer/Payout";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminPayments from "./pages/admin/AdminPayments";
+import AdminTransactions from "./pages/admin/AdminTransactions";
 
 export default function App() {
     return (
@@ -130,6 +133,34 @@ export default function App() {
                     </ProtectedRoute>
                 }
             />
+            
+            <Route
+            path="/admin-users"
+            element={
+                <ProtectedRoute allowedRole="ADMIN">
+                <AdminUsers />
+                </ProtectedRoute>
+            }
+            />
+
+            <Route
+            path="/admin-payments"
+            element={
+                <ProtectedRoute allowedRole="ADMIN">
+                <AdminPayments />
+                </ProtectedRoute>
+            }
+            />
+
+            <Route
+            path="/admin-transactions"
+            element={
+                <ProtectedRoute allowedRole="ADMIN">
+                <AdminTransactions />
+                </ProtectedRoute>
+            }
+            />
+
 
             {/* Unknown URL */}
             <Route
