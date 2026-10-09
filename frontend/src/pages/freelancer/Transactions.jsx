@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+
 import {
     FiBarChart2,
     FiInfo,
-    FiRefreshCw
+    FiRefreshCw,
+    FiSend
 } from "react-icons/fi";
 
 import DashboardLayout from "../../components/DashboardLayout";
@@ -12,8 +14,15 @@ import "./dashboardPages.css";
 
 export default function FreelancerTransactions() {
     const [transactions, setTransactions] = useState([]);
+
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+
+    const [receiverId, setReceiverId] = useState("");
+    const [amount, setAmount] = useState("");
+
+    const [transferring, setTransferring] = useState(false);
+    const [success, setSuccess] = useState("");
     const [error, setError] = useState("");
 
     const userId = getUserId();
@@ -36,10 +45,7 @@ export default function FreelancerTransactions() {
                 Array.isArray(data) ? data : []
             );
         } catch (err) {
-            console.error(
-                "Failed to load transactions:",
-                err
-            );
+            console.error("Failed to load transactions:", err);
 
             setError(
                 err.message ||
@@ -60,10 +66,70 @@ export default function FreelancerTransactions() {
         }
     }, [userId]);
 
+    const handleTransfer = async (event) => {
+        event.preventDefault();
+
+        setError("");
+        setSuccess("");
+
+        const trimmedReceiverId = receiverId.trim();
+        const numericAmount = Number(amount);
+
+        if (!trimmedReceiverId) {
+            setError("Please enter the receiver's user ID.");
+            return;
+        }
+
+        if (trimmedReceiverId === userId) {
+            setError("You cannot transfer money to yourself.");
+            return;
+        }
+
+        if (
+            !amount.trim() ||
+            !Number.isFinite(numericAmount) ||
+            numericAmount <= 0
+        ) {
+            setError("Enter an amount greater than zero.");
+            return;
+        }
+
+        try {
+            setTransferring(true);
+
+            await apiRequest(
+                `/transactions/transfer/${encodeURIComponent(userId)}/${encodeURIComponent(trimmedReceiverId)}?amount=${encodeURIComponent(numericAmount)}`,
+                {
+                    method: "POST"
+                }
+            );
+
+            setSuccess(
+                `Transfer of ₹${numericAmount.toLocaleString("en-IN", {
+                    maximumFractionDigits: 2
+                })} completed successfully.`
+            );
+
+            setReceiverId("");
+            setAmount("");
+
+            await loadTransactions(true);
+        } catch (err) {
+            console.error("Transfer failed:", err);
+
+            setError(
+                err.message ||
+                "Transfer failed. Please check the receiver ID and your wallet balance."
+            );
+        } finally {
+            setTransferring(false);
+        }
+    };
+
     return (
         <DashboardLayout
             title="Transactions"
-            subtitle="View all wallet transactions on your account."
+            subtitle="View wallet transactions and transfer funds to another freelancer."
             role="FREELANCER"
             navItems={[
                 {
@@ -106,6 +172,89 @@ export default function FreelancerTransactions() {
                 </div>
             )}
 
+            {success && (
+                <div className="success-message dashboard-message">
+                    <FiInfo />
+                    <span>{success}</span>
+                </div>
+            )}
+
+            <div className="content-card section-gap">
+                <div className="card-title-row">
+                    <div>
+                        <h2 className="card-title">
+                            Transfer to Freelancer
+                        </h2>
+
+                        <p className="card-subtitle">
+                            Transfer funds from your wallet to another
+                            freelancer's wallet.
+                        </p>
+                    </div>
+
+                    <div className="stat-icon">
+                        <FiSend />
+                    </div>
+                </div>
+
+                <form onSubmit={handleTransfer}>
+                    <div className="form-group">
+                        <label htmlFor="receiverId">
+                            Receiver's User ID
+                        </label>
+
+                        <input
+                            id="receiverId"
+                            type="text"
+                            value={receiverId}
+                            onChange={(event) =>
+                                setReceiverId(event.target.value)
+                            }
+                            placeholder="Enter the receiver's user ID"
+                            required
+                            disabled={transferring}
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="transferAmount">
+                            Amount (₹)
+                        </label>
+
+                        <input
+                            id="transferAmount"
+                            type="number"
+                            min="0.01"
+                            step="0.01"
+                            value={amount}
+                            onChange={(event) =>
+                                setAmount(event.target.value)
+                            }
+                            placeholder="Enter amount to transfer"
+                            required
+                            disabled={transferring}
+                        />
+                    </div>
+
+                    <button
+                        type="submit"
+                        className="btn btn-primary"
+                        disabled={transferring || !userId}
+                    >
+                        <FiSend />
+
+                        {transferring
+                            ? "Processing Transfer..."
+                            : "Transfer Money"}
+                    </button>
+                </form>
+
+                <p className="card-subtitle">
+                    Transfers are permitted only between freelancer
+                    accounts. Make sure the receiver's user ID is correct.
+                </p>
+            </div>
+
             <div className="dashboard-grid stats-grid">
                 <div className="stat-card">
                     <div className="stat-label">
@@ -140,10 +289,7 @@ export default function FreelancerTransactions() {
                             .reduce(
                                 (total, transaction) =>
                                     total +
-                                    Number(
-                                        transaction.amount ||
-                                        0
-                                    ),
+                                    Number(transaction.amount || 0),
                                 0
                             )
                             .toLocaleString("en-IN")}
@@ -168,132 +314,73 @@ export default function FreelancerTransactions() {
                     </div>
 
                     <button
+                        type="button"
                         className="btn btn-secondary"
-                        onClick={() =>
-                            loadTransactions(true)
-                        }
+                        onClick={() => loadTransactions(true)}
                         disabled={loading || refreshing}
                     >
                         <FiRefreshCw />
 
-                        {refreshing
-                            ? "Refreshing..."
-                            : "Refresh"}
+                        {refreshing ? "Refreshing..." : "Refresh"}
                     </button>
                 </div>
 
                 {loading ? (
                     <div className="empty-state">
-                        <strong>
-                            Loading transactions...
-                        </strong>
-
-                        Please wait while we retrieve
-                        your transaction history.
+                        <strong>Loading transactions...</strong>
+                        Please wait while we retrieve your transaction history.
                     </div>
                 ) : transactions.length === 0 ? (
                     <div className="empty-state">
-                        <strong>
-                            No transactions found
-                        </strong>
-
-                        Your wallet transactions will
-                        appear here.
+                        <strong>No transactions found</strong>
+                        Your wallet transactions will appear here.
                     </div>
                 ) : (
                     <div className="table-wrap">
                         <table className="data-table">
                             <thead>
                                 <tr>
-                                    <th>
-                                        Transaction ID
-                                    </th>
-                                    <th>
-                                        Payment ID
-                                    </th>
-                                    <th>
-                                        Type
-                                    </th>
-                                    <th>
-                                        Amount
-                                    </th>
-                                    <th>
-                                        Date
-                                    </th>
-                                    <th>
-                                        Time
-                                    </th>
-                                    <th>
-                                        Remarks
-                                    </th>
+                                    <th>Transaction ID</th>
+                                    <th>Payment ID</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Remarks</th>
                                 </tr>
                             </thead>
 
                             <tbody>
-                                {transactions.map(
-                                    (transaction) => (
-                                        <tr
-                                            key={
-                                                transaction.id
-                                            }
-                                        >
-                                            <td>
-                                                {
-                                                    transaction.id
-                                                }
-                                            </td>
+                                {transactions.map((transaction) => (
+                                    <tr key={transaction.id}>
+                                        <td>{transaction.id}</td>
 
-                                            <td>
-                                                {
-                                                    transaction.paymentId ||
-                                                    "—"
-                                                }
-                                            </td>
+                                        <td>
+                                            {transaction.paymentId || "—"}
+                                        </td>
 
-                                            <td>
-                                                <span className="status-badge">
-                                                    {
-                                                        transaction.type ||
-                                                        "—"
-                                                    }
-                                                </span>
-                                            </td>
+                                        <td>
+                                            <span className="status-badge">
+                                                {transaction.type || "—"}
+                                            </span>
+                                        </td>
 
-                                            <td>
-                                                <strong>
-                                                    ₹
-                                                    {Number(
-                                                        transaction.amount ||
-                                                        0
-                                                    ).toLocaleString(
-                                                        "en-IN"
-                                                    )}
-                                                </strong>
-                                            </td>
+                                        <td>
+                                            <strong>
+                                                ₹
+                                                {Number(
+                                                    transaction.amount || 0
+                                                ).toLocaleString("en-IN")}
+                                            </strong>
+                                        </td>
 
-                                            <td>
-                                                {
-                                                    transaction.date ||
-                                                    "—"
-                                                }
-                                            </td>
+                                        <td>{transaction.date || "—"}</td>
 
-                                            <td>
-                                                {
-                                                    transaction.time ||
-                                                    "—"
-                                                }
-                                            </td>
+                                        <td>{transaction.time || "—"}</td>
 
-                                            <td>
-                                                {
-                                                    transaction.remarks ||
-                                                    "—"
-                                                }
-                                            </td>
-                                        </tr>
-                                    )
-                                )}
+                                        <td>{transaction.remarks || "—"}</td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                     </div>
