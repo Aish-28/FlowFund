@@ -91,6 +91,11 @@ export default function FreelancerTransactions() {
                     to: "/freelancer-transactions",
                     icon: "transactions",
                     active: true
+                },
+                {
+                    label: "Profile",
+                    to: "/profile",
+                    icon: "settings"
                 }
             ]}
         >

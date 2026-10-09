@@ -108,6 +108,11 @@ export default function FreelancerDashboard() {
                     label: "Transactions",
                     to: "/freelancer-transactions",
                     icon: "transactions"
+                },
+                {
+                    label: "Profile",
+                    to: "/profile",
+                    icon: "settings"
                 }
             ]}
         >

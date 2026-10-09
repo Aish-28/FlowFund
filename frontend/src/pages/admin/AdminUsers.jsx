@@ -1,15 +1,17 @@
 
 import { useCallback, useEffect, useState } from "react";
-import { FiRefreshCw, FiShield } from "react-icons/fi";
+import { FiRefreshCw, FiShield, FiX, FiEye } from "react-icons/fi";
 import DashboardLayout from "../../components/DashboardLayout";
 import { getAdminUsers, updateAdminUserStatus } from "../../services/adminService";
 import "./AdminModule.css";
+
 
 const navItems = [
   { label: "Dashboard", path: "/admin-dashboard", icon: "dashboard" },
   { label: "Users", path: "/admin-users", icon: "users" },
   { label: "Payments", path: "/admin-payments", icon: "wallet" },
   { label: "Transactions", path: "/admin-transactions", icon: "transactions" },
+  { label: "Add Admin", path: "/admin/add", icon: "settings" },
 ];
 
 const formatDate = (value) => {
@@ -28,6 +30,7 @@ function AdminUsers() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [updatingId, setUpdatingId] = useState("");
+  const [selectedUser, setSelectedUser] = useState(null);
 
   const loadUsers = useCallback(async () => {
     setLoading(true);
@@ -137,9 +140,22 @@ function AdminUsers() {
                     return (
                       <tr key={user.id}>
                         <td>
-                          <div className="admin-primary-text">
+                          <button
+                            type="button"
+                            className="admin-primary-text"
+                            onClick={() => setSelectedUser(user)}
+                            style={{
+                              background: "none",
+                              border: "none",
+                              padding: 0,
+                              cursor: "pointer",
+                              textAlign: "left",
+                              font: "inherit",
+                              fontWeight: 600,
+                            }}
+                          >
                             {user.name || "—"}
-                          </div>
+                          </button>
                           <div className="admin-secondary-text">
                             {user.email || "—"}
                           </div>
@@ -188,6 +204,68 @@ function AdminUsers() {
           )}
         </section>
       </div>
+      {selectedUser && (
+        <div
+          className="admin-modal-overlay"
+          onClick={() => setSelectedUser(null)}
+        >
+          <section
+            className="admin-panel admin-user-details-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="user-details-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="admin-panel-header">
+              <h2 id="user-details-title">User Details</h2>
+
+              <button
+                type="button"
+                className="admin-refresh-button"
+                onClick={() => setSelectedUser(null)}
+                aria-label="Close user details"
+              >
+                <FiX />
+              </button>
+            </div>
+
+            <div className="admin-user-details-grid">
+              <p>
+                <strong>User ID:</strong> {selectedUser.id || "—"}
+              </p>
+
+              <p>
+                <strong>Name:</strong> {selectedUser.name || "—"}
+              </p>
+
+              <p>
+                <strong>Email:</strong> {selectedUser.email || "—"}
+              </p>
+
+              <p>
+                <strong>Phone:</strong> {selectedUser.phNo || "—"}
+              </p>
+
+              <p>
+                <strong>Role:</strong> {selectedUser.role || "—"}
+              </p>
+
+              <p>
+                <strong>Status:</strong> {selectedUser.status || "—"}
+              </p>
+
+              <p>
+                <strong>Registration Date:</strong>{" "}
+                {formatDate(selectedUser.createdAt)}
+              </p>
+            </div>
+
+            <p className="admin-secondary-text">
+              Read-only view. User details cannot be edited here.
+            </p>
+          </section>
+        </div>
+      )}
     </DashboardLayout>
   );
 }

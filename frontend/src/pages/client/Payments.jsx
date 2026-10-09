@@ -100,6 +100,11 @@ export default function Payments() {
                     label: "Transactions",
                     to: "/client-transactions",
                     icon: "transactions"
+                },
+                {
+                    label: "Profile",
+                    to: "/profile",
+                    icon: "settings"
                 }
             ]}
         >

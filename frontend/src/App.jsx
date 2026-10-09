@@ -20,6 +20,8 @@ import FreelancerPayout from "./pages/freelancer/Payout";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminPayments from "./pages/admin/AdminPayments";
 import AdminTransactions from "./pages/admin/AdminTransactions";
+import Profile from "./pages/Profile";
+import AddAdmin from "./pages/admin/AddAdmin";
 
 export default function App() {
     return (
@@ -116,13 +118,23 @@ export default function App() {
             />
 
             <Route
-              path="/client-transactions"
-              element={
-                  <ProtectedRoute allowedRole="CLIENT">
-                      <Transactions />
-                  </ProtectedRoute>
-              }
-          />
+                path="/client-transactions"
+                element={
+                    <ProtectedRoute allowedRole="CLIENT">
+                        <Transactions />
+                    </ProtectedRoute>
+                }
+            />
+
+            {/* Profile */}
+            <Route
+                path="/profile"
+                element={
+                    <ProtectedRoute>
+                        <Profile />
+                    </ProtectedRoute>
+                }
+            />
 
             {/* Admin */}
             <Route
@@ -157,6 +169,15 @@ export default function App() {
             element={
                 <ProtectedRoute allowedRole="ADMIN">
                 <AdminTransactions />
+                </ProtectedRoute>
+            }
+            />
+
+            <Route
+            path="/admin/add"
+            element={
+                <ProtectedRoute allowedRole="ADMIN">
+                <AddAdmin />
                 </ProtectedRoute>
             }
             />

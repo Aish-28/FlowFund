@@ -10,6 +10,7 @@ const navItems = [
   { label: "Users", path: "/admin-users", icon: "users" },
   { label: "Payments", path: "/admin-payments", icon: "wallet" },
   { label: "Transactions", path: "/admin-transactions", icon: "transactions" },
+  { label: "Add Admin", path: "/admin/add", icon: "settings" },
 ];
 
 const formatCurrency = (value) =>

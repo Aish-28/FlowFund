@@ -1,0 +1,139 @@
+
+.add-admin-page {
+  width: 100%;
+  padding: 8px 0 24px;
+}
+
+.add-admin-card {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 30px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.05);
+}
+
+.add-admin-heading {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.add-admin-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: #eef2ff;
+  color: #4338ca;
+  font-size: 24px;
+}
+
+.add-admin-heading h1 {
+  margin: 0 0 6px;
+  color: #111827;
+  font-size: 23px;
+}
+
+.add-admin-heading p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.add-admin-card form {
+  display: flex;
+  flex-direction: column;
+}
+
+.add-admin-card form label {
+  margin: 18px 0 8px;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.add-admin-input {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  color: #6b7280;
+}
+
+.add-admin-input:focus-within {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.add-admin-input input {
+  width: 100%;
+  min-width: 0;
+  padding: 12px 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #111827;
+  font: inherit;
+}
+
+.add-admin-card form button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 48px;
+  margin-top: 26px;
+  border: none;
+  border-radius: 8px;
+  background: #4338ca;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.add-admin-card form button:hover {
+  background: #3730a3;
+}
+
+.add-admin-card form button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.add-admin-message {
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.add-admin-message.error {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.add-admin-message.success {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+@media (max-width: 600px) {
+  .add-admin-card {
+    padding: 20px;
+  }
+
+  .add-admin-heading h1 {
+    font-size: 20px;
+  }
+}

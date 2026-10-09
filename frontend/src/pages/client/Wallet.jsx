@@ -84,6 +84,11 @@ export default function Wallet() {
                     label: "Transactions",
                     to: "/client-transactions",
                     icon: "transactions"
+                },
+                {
+                    label: "Profile",
+                    to: "/profile",
+                    icon: "settings"
                 }
             ]}
         >

@@ -1,7 +1,6 @@
 import { Navigate } from "react-router-dom";
 
 function ProtectedRoute({ children, allowedRole }) {
-
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
 
@@ -9,8 +8,8 @@ function ProtectedRoute({ children, allowedRole }) {
         return <Navigate to="/login" replace />;
     }
 
-    if (role !== allowedRole) {
-
+    // Check role only when a specific role is required.
+    if (allowedRole && role !== allowedRole) {
         if (role === "CLIENT") {
             return <Navigate to="/client-dashboard" replace />;
         }

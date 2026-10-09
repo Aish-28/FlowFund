@@ -38,3 +38,9 @@ export const getAdminPayments = () =>
 
 export const getAdminTransactions = () =>
   apiRequest("/admin/transactions");
+
+export const createAdmin = (adminData) =>
+  apiRequest("/admin/register", {
+    method: "POST",
+    body: JSON.stringify(adminData),
+  });

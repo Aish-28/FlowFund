@@ -20,4 +20,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     List<User> findAllByOrderByCreatedAtDesc();
 
     long countByRole(UserRoles role);
+
+    boolean existsByPhNoAndIdNot(String phNo, UUID id);
 }

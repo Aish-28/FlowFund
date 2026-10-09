@@ -289,6 +289,11 @@ export default function FreelancerPayout() {
                     to: "/freelancer-payout",
                     icon: "settings",
                     active: true
+                },
+                {
+                    label: "Profile",
+                    to: "/profile",
+                    icon: "settings"
                 }
             ]}
         >

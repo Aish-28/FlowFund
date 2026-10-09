@@ -90,6 +90,11 @@ export default function Transactions() {
                     to: "/client-transactions",
                     icon: "transactions",
                     active: true
+                },
+                {
+                    label: "Profile",
+                    to: "/profile",
+                    icon: "settings"
                 }
             ]}
         >
