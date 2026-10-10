@@ -1,8 +1,10 @@
+
 import { useEffect, useState } from "react";
 import {
     FiCreditCard,
     FiInfo,
-    FiRefreshCw
+    FiRefreshCw,
+    FiShield
 } from "react-icons/fi";
 
 import DashboardLayout from "../../components/DashboardLayout";
@@ -14,7 +16,10 @@ export default function FreelancerWallet() {
     const [wallet, setWallet] = useState(null);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+    const [reserveAmount, setReserveAmount] = useState("");
+    const [savingReserve, setSavingReserve] = useState(false);
     const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
 
     const userId = getUserId();
 
@@ -35,11 +40,7 @@ export default function FreelancerWallet() {
             setWallet(data);
         } catch (err) {
             console.error("Failed to load wallet:", err);
-
-            setError(
-                err.message ||
-                "Unable to load wallet details."
-            );
+            setError(err.message || "Unable to load wallet details.");
         } finally {
             setLoading(false);
             setRefreshing(false);
@@ -56,9 +57,56 @@ export default function FreelancerWallet() {
     }, [userId]);
 
     const balance = Number(wallet?.balance || 0);
-    const reserveBalance = Number(
-        wallet?.reserveBalance || 0
-    );
+    const reserveBalance = Number(wallet?.reserveBalance || 0);
+    const totalFunds = balance + reserveBalance;
+
+    const handleReserveSubmit = async (event) => {
+        event.preventDefault();
+
+        setError("");
+        setSuccess("");
+
+        if (reserveAmount.trim() === "") {
+            setError("Please enter a reserve amount.");
+            return;
+        }
+
+        const amount = Number(reserveAmount);
+
+        if (!Number.isFinite(amount) || amount < 0) {
+            setError("Reserve amount cannot be negative.");
+            return;
+        }
+
+        if (amount > totalFunds) {
+            setError(
+                "Reserve amount cannot exceed your total wallet funds."
+            );
+            return;
+        }
+
+        try {
+            setSavingReserve(true);
+
+            const updatedWallet = await apiRequest(
+                `/wallets/user/${encodeURIComponent(userId)}/reserve?amount=${encodeURIComponent(amount)}`,
+                {
+                    method: "PUT"
+                }
+            );
+
+            setWallet(updatedWallet);
+            setReserveAmount("");
+            setSuccess("Reserve balance updated successfully.");
+        } catch (err) {
+            console.error("Failed to update reserve balance:", err);
+            setError(
+                err.message || "Unable to update reserve balance."
+            );
+        } finally {
+            setSavingReserve(false);
+        }
+    };
 
     return (
         <DashboardLayout
@@ -106,20 +154,24 @@ export default function FreelancerWallet() {
                 </div>
             )}
 
+            {success && (
+                <div className="success-message dashboard-message">
+                    <FiShield />
+                    <span>{success}</span>
+                </div>
+            )}
+
             <div className="dashboard-grid stats-grid">
                 <div className="stat-card">
                     <div className="stat-label">
                         <span>Available Balance</span>
-
                         <div className="stat-icon">
                             <FiCreditCard />
                         </div>
                     </div>
-
                     <div className="stat-value">
                         ₹{balance.toLocaleString("en-IN")}
                     </div>
-
                     <div className="stat-note">
                         Current wallet balance
                     </div>
@@ -128,16 +180,13 @@ export default function FreelancerWallet() {
                 <div className="stat-card">
                     <div className="stat-label">
                         <span>Reserve Balance</span>
-
                         <div className="stat-icon">
-                            <FiCreditCard />
+                            <FiShield />
                         </div>
                     </div>
-
                     <div className="stat-value">
                         ₹{reserveBalance.toLocaleString("en-IN")}
                     </div>
-
                     <div className="stat-note">
                         Amount retained as reserve
                     </div>
@@ -145,19 +194,16 @@ export default function FreelancerWallet() {
 
                 <div className="stat-card">
                     <div className="stat-label">
-                        <span>Wallet Status</span>
-
+                        <span>Total Wallet Funds</span>
                         <div className="stat-icon">
-                            <FiInfo />
+                            <FiCreditCard />
                         </div>
                     </div>
-
                     <div className="stat-value">
-                        {wallet?.status || "—"}
+                        ₹{totalFunds.toLocaleString("en-IN")}
                     </div>
-
                     <div className="stat-note">
-                        Current wallet status
+                        Available balance + reserve
                     </div>
                 </div>
             </div>
@@ -165,25 +211,20 @@ export default function FreelancerWallet() {
             <div className="content-card section-gap">
                 <div className="card-title-row">
                     <div>
-                        <h2 className="card-title">
-                            Wallet Details
-                        </h2>
-
+                        <h2 className="card-title">Wallet Details</h2>
                         <p className="card-subtitle">
                             Information retrieved from your FlowFund wallet.
                         </p>
                     </div>
 
                     <button
+                        type="button"
                         className="btn btn-secondary"
                         onClick={() => loadWallet(true)}
-                        disabled={loading || refreshing}
+                        disabled={loading || refreshing || savingReserve}
                     >
                         <FiRefreshCw />
-
-                        {refreshing
-                            ? "Refreshing..."
-                            : "Refresh"}
+                        {refreshing ? "Refreshing..." : "Refresh"}
                     </button>
                 </div>
 
@@ -196,52 +237,92 @@ export default function FreelancerWallet() {
                     <>
                         <div className="info-strip">
                             <FiInfo />
-
                             <span>
-                                Your FlowFund wallet stores payments
-                                received from clients. The reserve
-                                balance is maintained separately.
+                                Your reserve is part of your existing wallet
+                                funds. Setting it changes how your funds are
+                                allocated; it does not add money.
                             </span>
                         </div>
 
                         <div className="wallet-summary-box">
                             <div>
                                 <span>Wallet ID</span>
-
-                                <strong>
-                                    {wallet.id || "—"}
-                                </strong>
+                                <strong>{wallet.id || "—"}</strong>
                             </div>
 
                             <div>
                                 <span>User ID</span>
-
                                 <strong>
-                                    {wallet.userId || userId || "—"}
+                                    {wallet.user?.id || wallet.userId || userId || "—"}
                                 </strong>
                             </div>
 
                             <div>
                                 <span>Available Balance</span>
-
                                 <strong>
-                                    ₹
-                                    {balance.toLocaleString(
-                                        "en-IN"
-                                    )}
+                                    ₹{balance.toLocaleString("en-IN")}
                                 </strong>
                             </div>
 
                             <div>
                                 <span>Reserve Balance</span>
-
                                 <strong>
-                                    ₹
-                                    {reserveBalance.toLocaleString(
-                                        "en-IN"
-                                    )}
+                                    ₹{reserveBalance.toLocaleString("en-IN")}
                                 </strong>
                             </div>
+
+                            <div>
+                                <span>Wallet Status</span>
+                                <strong>{wallet.status || "—"}</strong>
+                            </div>
+                        </div>
+
+                        <div className="section-gap">
+                            <h2 className="card-title">
+                                Set Reserve Balance
+                            </h2>
+                            <p className="card-subtitle">
+                                Choose how much of your total funds to retain
+                                as your reserve for future monthly payouts.
+                            </p>
+
+                            <form onSubmit={handleReserveSubmit}>
+                                <div className="form-group">
+                                    <label htmlFor="reserveAmount">
+                                        Reserve amount (₹)
+                                    </label>
+                                    <input
+                                        id="reserveAmount"
+                                        type="number"
+                                        min="0"
+                                        max={totalFunds}
+                                        step="0.01"
+                                        value={reserveAmount}
+                                        onChange={(event) => {
+                                            setReserveAmount(event.target.value);
+                                            setError("");
+                                            setSuccess("");
+                                        }}
+                                        placeholder="Enter reserve amount"
+                                        disabled={savingReserve}
+                                        required
+                                    />
+                                    <small>
+                                        Maximum available to allocate: ₹
+                                        {totalFunds.toLocaleString("en-IN")}
+                                    </small>
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    className="btn btn-primary"
+                                    disabled={savingReserve || !wallet}
+                                >
+                                    {savingReserve
+                                        ? "Saving..."
+                                        : "Set Reserve Balance"}
+                                </button>
+                            </form>
                         </div>
                     </>
                 ) : (
